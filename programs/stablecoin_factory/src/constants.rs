@@ -1,0 +1,1 @@
+pub const MAX_BOND_MAPPINGS: usize = 6;

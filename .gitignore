@@ -1,0 +1,22 @@
+# Build artifacts
+/target/
+**/target/
+
+# Dependencies
+/node_modules/
+**/node_modules/
+
+# Anchor specific
+.anchor/
+test-ledger/
+**/*.rs.bk
+
+# Solana specific
+.env
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
