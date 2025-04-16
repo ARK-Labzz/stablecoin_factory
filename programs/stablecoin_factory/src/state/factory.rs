@@ -29,4 +29,6 @@ pub struct Factory {
     pub burn_fee_bps: u16,              // Fee in basis points for burning, if any
     pub bond_mappings_count: u8,
     pub bond_mappings: [BondCurrencyMapping; MAX_BOND_MAPPINGS],
+    pub payment_base_price_feed_account: Pubkey,      // USDC/USD price feed
+    pub payment_quote_price_feed_account: Option<Pubkey>,  // Optional quote price feed
 }

@@ -69,6 +69,9 @@ impl InitializeFactory<'_> {
         factory.yield_share_protocol = yield_share_protocol;
         factory.yield_share_issuer = yield_share_issuer;
         factory.yield_share_holders = yield_share_holders;
+
+        factory.payment_base_price_feed_account = Pubkey::default();
+        factory.payment_quote_price_feed_account = None;
         
         factory.mint_fee_bps = 0;
         factory.burn_fee_bps = 0;

@@ -50,4 +50,16 @@ pub enum StablecoinError {
     InvalidFiatCurrency,
     #[msg("The provided bond mint does not match the expected one for this currency")]
     InvalidBondMint,
+    #[msg("Invalid price feed address")]
+    InvalidPriceFeed,
+    #[msg("Insufficient balance to redeem")]
+    InsufficientBalance,
+    #[msg("Bond ownership account required for this redemption")]
+    BondOwnershipAccountRequired,
+    #[msg("NFT token account required for bond redemption")]
+    NFTTokenAccountRequired,
+    #[msg("Instant bond redemption failed")]
+    InstantRedemptionFailed,
+    #[msg("NFT redemption Failed")]
+    NFTRedemptionFailed,
 }

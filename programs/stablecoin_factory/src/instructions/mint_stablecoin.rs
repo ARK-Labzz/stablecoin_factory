@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct MintStablecoinArgs {
+pub struct MintSovereignArgs {
     pub usdc_amount: u64,
 }
 
@@ -64,8 +64,21 @@ pub struct MintSovereignCoin<'info> {
     )]
     pub bond_holding: Box<InterfaceAccount<'info, TokenAccount>>,
     
+    pub mint: InterfaceAccount<'info, Mint>,
     pub fiat_token_mint: Box<InterfaceAccount<'info, Mint>>,
     pub bond_token_mint: Box<InterfaceAccount<'info, Mint>>,
+
+    /// CHECK: We are only reading from this account
+    #[account(
+        constraint = payment_base_price_feed_account.key() == factory.payment_base_price_feed_account @ StablecoinError::InvalidPriceFeed
+    )]
+    pub payment_base_price_feed_account: UncheckedAccount<'info>,
+
+    /// CHECK: We are only reading from this account
+    #[account(
+        constraint = payment_quote_price_feed_account.key() == factory.payment_quote_price_feed_account.expect("No price feed configured") @ StablecoinError::InvalidPriceFeed
+    )]
+    pub payment_quote_price_feed_account: Option<UncheckedAccount<'info>>,
     
     pub system_program: Program<'info, System>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -73,7 +86,7 @@ pub struct MintSovereignCoin<'info> {
 }
 
 impl MintSovereignCoin<'_> {
-    pub fn handler(ctx: Context<Self>, args: MintStablecoinArgs) -> Result<()> {
+    pub fn handler(ctx: Context<Self>, args: MintSovereignArgs) -> Result<()> {
         let factory = &ctx.accounts.factory;
         let sovereign_coin = &mut ctx.accounts.sovereign_coin;
         let protocol_vault = &ctx.accounts.protocol_vault;
@@ -253,12 +266,10 @@ impl MintSovereignCoin<'_> {
             .ok_or(StablecoinError::MathError)?;
 
         // After minting, verify the balance increased by the amount of sovereign coins minted
-        let user_token_account_info = &ctx.accounts.user_sovereign_coin_account.to_account_info();
-        let user_token_account = InterfaceAccount::<TokenAccount>::try_from(user_token_account_info)?;
-
+        ctx.accounts.user_sovereign_coin_account.reload()?;
         
         require!(
-            user_token_account.amount == previous_balance.checked_add(args.usdc_amount).unwrap(),
+            ctx.accounts.user_sovereign_coin_account.amount == previous_balance.checked_add(args.usdc_amount).unwrap(),
             StablecoinError::MintVerificationFailed
         );
 

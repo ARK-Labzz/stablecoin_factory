@@ -9,7 +9,7 @@ use anchor_spl::{
     token_interface::{self, Burn, Mint, MintTo, TokenInterface, TokenAccount, TransferChecked, spl_token_2022},
     token::{self, spl_token}
 };
-use stablebond_sdk::{instructions::{PurchaseBondV2, PurchaseBondV2InstructionArgs}, types::PaymentFeedType, find_bond_pda, find_issuance_pda, find_payment_pda, find_kyc_pda, find_payment_feed_pda};
+use stablebond_sdk::{instructions::{PurchaseBondV2, PurchaseBondV2InstructionArgs, RedeemBond, InstantBondRedemption, InstantBondRedemptionInstructionArgs}, types::PaymentFeedType, find_bond_pda, find_issuance_pda, find_payment_pda, find_kyc_pda, find_payment_feed_pda, find_nft_issuance_vault_pda};
 use spl_math::precise_number::PreciseNumber;
 
 pub mod error;
@@ -100,6 +100,18 @@ pub mod stablecoin_factory {
 
     pub fn finalize_setup(ctx: Context<FinalizeSetup>) -> Result<()> {
         FinalizeSetup::handler(ctx)
+    }
+
+    pub fn mint_sovereign_coin(ctx: Context<MintSovereignCoin>, args: MintSovereignArgs) -> Result<()> {
+        MintSovereignCoin::handler(ctx, args)
+    }
+
+    pub fn redeem_sovereign_coin(ctx: Context<RedeemSovereignCoin>, args: RedeemSovereignArgs) -> Result<()> {
+        RedeemSovereignCoin::handler(ctx, args)
+    }
+
+    pub fn update_price_feed(ctx: Context<UpdatePriceFeeds>, args: PriceFeedsArgs) -> Result<()> {
+        UpdatePriceFeeds::handler(ctx, args)
     }
 }
 

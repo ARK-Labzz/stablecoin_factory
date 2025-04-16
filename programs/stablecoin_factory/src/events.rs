@@ -79,3 +79,25 @@ pub struct SovereignCoinMintedEvent {
     pub timestamp: i64,
 }
 
+#[event]
+pub struct PriceFeedsUpdatedEvent {
+    pub authority: Pubkey,
+    pub factory: Pubkey,
+    pub base_price_feed: Pubkey,
+    pub quote_price_feed: Option<Pubkey>,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct SovereignCoinRedeemedEvent {
+    pub payer: Pubkey,
+    pub sovereign_coin: Pubkey,
+    pub usdc_amount: u64,
+    pub from_fiat_reserve: u64,
+    pub from_protocol_vault: u64,
+    pub from_bond_redemption: u64,
+    pub protocol_fee: u64,
+    pub timestamp: i64,
+    pub redemption_type: RedemptionType,
+}
+
