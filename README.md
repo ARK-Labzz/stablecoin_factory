@@ -18,3 +18,6 @@ To test the Stablecoin Factory project, follow these steps:
 1. Navigate to the project root: cd stable-program-library/stablecoin_factory
 2. Run the tests using Anchor's test command: anchor test
 3. Verify that all tests pass.
+
+## Our Platform UI
+stable.fun UI codebase is public and is available (here)[https://github.com/ARK-Labzz/stabledotfun-web]
