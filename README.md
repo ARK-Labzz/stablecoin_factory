@@ -20,4 +20,4 @@ To test the Stablecoin Factory project, follow these steps:
 3. Verify that all tests pass.
 
 ## Our Platform UI
-stable.fun UI codebase is public and is available (here)[https://github.com/ARK-Labzz/stabledotfun-web]
+Stablecoin Factory UI codebase is public and is available [here](https://github.com/ARK-Labzz/stabledotfun-web)
