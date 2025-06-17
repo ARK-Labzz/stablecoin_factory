@@ -62,4 +62,8 @@ pub enum StablecoinError {
     InstantRedemptionFailed,
     #[msg("NFT redemption Failed")]
     NFTRedemptionFailed,
+    #[msg("There are no token accounts to harvest")]
+    NoTokenAccountsToHarvest,
+    #[msg("An invalid rate authority exists in the program")]
+    InvalidRateAuthority
 }

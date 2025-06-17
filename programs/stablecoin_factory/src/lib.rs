@@ -1,16 +1,87 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{self, system_program};
+use anchor_lang::solana_program::{
+    self, 
+    system_program, 
+    msg
+};
 use anchor_spl::metadata::{
-    create_metadata_accounts_v3, mpl_token_metadata::types::DataV2, CreateMetadataAccountsV3,
+    create_metadata_accounts_v3, 
+    mpl_token_metadata::types::DataV2, 
+    CreateMetadataAccountsV3,
     Metadata,
 };
 use anchor_spl::{
-    associated_token::{AssociatedToken, spl_associated_token_account},
-    token_interface::{self, Burn, Mint, MintTo, TokenInterface, TokenAccount, TransferChecked, spl_token_2022},
-    token::{self, spl_token}
+    associated_token::{
+        AssociatedToken, 
+        spl_associated_token_account, 
+        get_associated_token_address_with_program_id, 
+        get_associated_token_address
+    },
+    token_interface::{
+        self, 
+        Burn, 
+        Mint, 
+        MintTo, 
+        TokenInterface, 
+        TokenAccount, 
+        TransferChecked, 
+        spl_token_2022, 
+        spl_pod::optional_keys::OptionalNonZeroPubkey, 
+        transfer_checked_with_fee, 
+        transfer_fee_initialize,
+        harvest_withheld_tokens_to_mint,
+        withdraw_withheld_tokens_from_mint,
+        HarvestWithheldTokensToMint,
+        WithdrawWithheldTokensFromMint,
+        Token2022, 
+        TransferFeeInitialize,
+        TransferFeeSetTransferFee,
+        InterestBearingMintInitialize,
+        InterestBearingMintUpdateRate,
+        interest_bearing_mint_initialize, 
+        interest_bearing_mint_update_rate,
+    },
+    token::{self, spl_token},
+    token_2022::{
+        spl_token_2022::{
+            extension::{
+                interest_bearing_mint::InterestBearingConfig,
+                transfer_fee::TransferFeeConfig, 
+                BaseStateWithExtensions, 
+                ExtensionType, 
+                StateWithExtensions,
+            },
+            pod::PodMint,
+            state::Mint as MintState,
+        },
+        initialize_mint2,
+        InitializeMint2,
+    },
 };
-use stablebond_sdk::{instructions::{PurchaseBondV2, PurchaseBondV2InstructionArgs, RedeemBond, InstantBondRedemption, InstantBondRedemptionInstructionArgs}, types::PaymentFeedType, find_bond_pda, find_issuance_pda, find_payment_pda, find_kyc_pda, find_payment_feed_pda, find_nft_issuance_vault_pda};
+use stablebond_sdk::{
+    instructions::{
+        PurchaseBondV2, 
+        PurchaseBondV2InstructionArgs, 
+        RedeemBond, 
+        InstantBondRedemption, 
+        InstantBondRedemptionInstructionArgs
+    }, 
+    types::PaymentFeedType, 
+    find_bond_pda, 
+    find_issuance_pda, 
+    find_payment_pda, 
+    find_kyc_pda, 
+    find_payment_feed_pda, 
+    find_nft_issuance_vault_pda
+};
 use spl_math::precise_number::PreciseNumber;
+use mpl_token_metadata::accounts::{
+    MasterEdition as MasterEditionMpl, 
+    Metadata as MetadataMpl
+};
+use std::panic::Location;
+use switchboard_v2::aggregator::AggregatorAccountData;
+use static_assertions::const_assert_eq;
 
 pub mod error;
 pub mod instructions;
@@ -18,6 +89,7 @@ pub mod state;
 pub mod helpers;
 pub mod events;
 pub mod constants;
+pub mod math;
 
 pub use error::StablecoinError;
 pub use instructions::*;
@@ -25,6 +97,7 @@ pub use state::*;
 pub use helpers::*;
 pub use events::*;
 pub use constants::*;
+pub use math::*;
 
 #[cfg(not(feature = "no-entrypoint"))]
 use solana_security_txt::security_txt;
@@ -33,14 +106,20 @@ use solana_security_txt::security_txt;
 security_txt! {
     name: "stablecoin_factory",
     project_url: "https://stable.fun",
-    contacts: "email:hello@stable.fun",
+    contacts: "email:team@stable.fun",
     policy: "Build quality.",
-    source_code: "https://github.com/donjne/stable-program-library",
-    source_release: "v0.1.0",
+    source_code: "https://github.com/donjne/stablecoin_factory",
+    source_release: "v1.0.0",
     auditors: "None for now",
     acknowledgements: "
-    The following hackers could've stolen all our money but didn't:
-    - Neodyme
+    Etherfuse
+    Neodyme
+    Light Protocol
+    Solana Labs
+    Anza
+    Metaplex
+    Meteora
+    MetaDAO
     "
 }
 
@@ -83,6 +162,67 @@ pub mod stablecoin_factory {
         RegisterBondMapping::handler(ctx, fiat_currency, bond_mint, bond_rating)
     }
 
+    pub fn preview_exchange(
+        ctx: Context<PreviewExchange>,
+        args: PreviewExchangeArgs,
+    ) -> Result<PreviewExchangeResult> {
+        PreviewExchange::handler(ctx, args)
+    }
+
+    pub fn update_interest_rate(
+        ctx: Context<UpdateInterestRate>,
+        manual_rate: Option<i16>,
+    ) -> Result<PreviewExchangeResult> {
+        UpdateInterestRate::handler(ctx, manual_rate)
+    }
+
+
+    pub fn setup_interest_bearing_mint(
+        ctx: Context<SetupInterestBearingMint>,
+        initial_rate: i16,
+    ) -> Result<()> {
+        handle_setup_interest_bearing_mint(ctx, args)
+    }
+
+    pub fn create_fee_operator(ctx: Context<CreateFeeOperatorCtx>) -> Result<()> {
+        handle_create_fee_operator(ctx)
+    }
+    
+    pub fn close_fee_operator(ctx: Context<CloseFeeOperatorCtx>) -> Result<()> {
+        handle_close_fee_operator(ctx)
+    }
+    
+    pub fn harvest_fees(ctx: Context<HarvestFees>) -> Result<()> {
+        handle_harvest_fees(ctx)
+    }
+    
+    pub fn withdraw_fees(ctx: Context<WithdrawFees>) -> Result<()> {
+        handle_withdraw_fees(ctx)
+    }
+    
+    pub fn initialize_transfer_fee(
+        ctx: Context<InitializeTransferFee>,
+        transfer_fee_basis_points: u16,
+        maximum_fee: u64,
+    ) -> Result<()> {
+        handle_initialize_transfer_fee(ctx, transfer_fee_basis_points, maximum_fee)
+    }
+    
+    pub fn update_transfer_fee(
+        ctx: Context<UpdateTransferFee>,
+        transfer_fee_basis_points: u16,
+        maximum_fee: u64,
+    ) -> Result<()> {
+        handle_update_transfer_fee(ctx, transfer_fee_basis_points, maximum_fee)
+    }
+    
+    pub fn withdraw_from_protocol_account(
+        ctx: Context<WithdrawFromProtocolAccount>,
+        amount: u64,
+    ) -> Result<()> {
+        handle_withdraw_from_protocol_account(ctx, amount)
+    }
+
     /// Initialize the sovereign coin account
     #[access_control(InitSovereignCoin::validate(&ctx.accounts, &args))]
     pub fn init_sovereign_coin(ctx: Context<InitSovereignCoin>, args: SovereignCoinArgs) -> Result<()> {
@@ -102,12 +242,28 @@ pub mod stablecoin_factory {
         FinalizeSetup::handler(ctx)
     }
 
-    pub fn mint_sovereign_coin(ctx: Context<MintSovereignCoin>, args: MintSovereignArgs) -> Result<()> {
-        MintSovereignCoin::handler(ctx, args)
+    pub fn initialize_mint_sovereign_coin(ctx: Context<InitializeMintSovereignCoin>, args: InitializeMintSovereignCoinArgs) -> Result<()> {
+        InitializeMintSovereignCoin::handler(ctx, args)
     }
 
-    pub fn redeem_sovereign_coin(ctx: Context<RedeemSovereignCoin>, args: RedeemSovereignArgs) -> Result<()> {
-        RedeemSovereignCoin::handler(ctx, args)
+    pub fn execute_mint_sovereign_coin(ctx: Context<ExecuteMintSovereignCoin>) -> Result<()> {
+        ExecuteMintSovereignCoin::handler(ctx)
+    }
+
+    pub fn initialize_redeem_sovereign_coin(ctx: Context<InitializeRedeemStablecoin>, args: InitializeRedeemStablecoinArgs) -> Result<()> {
+        InitializeRedeemStablecoin::handler(ctx, args)
+    }
+
+    pub fn execute_redeem_from_fiat(ctx: Context<ExecuteRedeemFromFiat>) -> Result<()> {
+        ExecuteRedeemFromFiat::handler(ctx)
+    }
+
+    pub fn execute_redeem_from_fiat_and_protocol(ctx: Context<ExecuteRedeemFromFiatAndProtocol>) -> Result<()> {
+        ExecuteRedeemFromFiatAndProtocol::handler(ctx)
+    }
+
+    pub fn execute_redeem_from_bonds(ctx: Context<ExecuteRedeemFromBonds>) -> Result<()> {
+        ExecuteRedeemFromBonds::handler(ctx)
     }
 
     pub fn update_price_feed(ctx: Context<UpdatePriceFeeds>, args: PriceFeedsArgs) -> Result<()> {

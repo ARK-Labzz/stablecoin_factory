@@ -73,6 +73,7 @@ pub struct SovereignCoinMintedEvent {
     pub payer: Pubkey,
     pub sovereign_coin: Pubkey,
     pub usdc_amount: u64,
+    pub sovereign_coin_amount: u64,
     pub reserve_amount: u64,
     pub bond_amount: u64,
     pub protocol_fee: u64,
@@ -92,12 +93,48 @@ pub struct PriceFeedsUpdatedEvent {
 pub struct SovereignCoinRedeemedEvent {
     pub payer: Pubkey,
     pub sovereign_coin: Pubkey,
+    pub sovereign_amount: u64,
     pub usdc_amount: u64,
     pub from_fiat_reserve: u64,
     pub from_protocol_vault: u64,
     pub from_bond_redemption: u64,
     pub protocol_fee: u64,
     pub timestamp: i64,
-    pub redemption_type: RedemptionType,
+    pub redemption_type: RedemptionTypeState,
+}
+
+/// Create claim fee operator
+#[event]
+pub struct EvtCreateClaimFeeOperator {
+    pub operator: Pubkey,
+}
+
+/// Close claim fee operator
+#[event]
+pub struct EvtCloseClaimFeeOperator {
+    pub claim_fee_operator: Pubkey,
+    pub operator: Pubkey,
+}
+
+#[event]
+pub struct SovereignCoinInterestRateUpdatedEvent {
+    pub sovereign_coin: Pubkey,
+    pub mint: Pubkey,
+    pub old_rate: i16, 
+    pub new_rate: i16, 
+    pub bond_mint: Pubkey,
+    pub timestamp: i64, 
+}
+
+// Event emitted when a sovereign coin with interest-bearing properties is initialized.
+#[event]
+pub struct SovereignCoinInterestBearingInitializedEvent {
+    /// Public key of the sovereign coin account.
+    pub sovereign_coin: Pubkey,
+    /// Public key of the mint associated with the sovereign coin.
+    pub mint: Pubkey,
+    /// Initial interest rate set for the sovereign coin.
+    pub interest_rate: i16,
+    pub timestamp: i64,
 }
 

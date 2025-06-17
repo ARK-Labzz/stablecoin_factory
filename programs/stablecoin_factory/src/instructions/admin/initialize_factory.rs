@@ -71,10 +71,11 @@ impl InitializeFactory<'_> {
         factory.yield_share_holders = yield_share_holders;
 
         factory.payment_base_price_feed_account = Pubkey::default();
+        factory.protocol_vault = Pubkey::default();
         factory.payment_quote_price_feed_account = None;
         
-        factory.mint_fee_bps = 0;
-        factory.burn_fee_bps = 0;
+        factory.transfer_fee_bps = 0;
+        factory.maximum_transfer_fee = 0;
 
        
         let clock = Clock::get()?;

@@ -157,8 +157,12 @@ impl InitSovereignCoin<'_> {
         sovereign_coin.total_supply = 0;
         sovereign_coin.fiat_amount = 0;
         sovereign_coin.bond_amount = 0;
+        sovereign_coin.interest_rate = 0;
+        sovereign_coin.is_interest_bearing = false;
+        sovereign_coin.is_compressed = false;
+        sovereign_coin.merkle_tree = None;
 
-       
+        
         let clock = Clock::get()?;
         emit_cpi!(SovereignCoinInitializedEvent {
             authority: ctx.accounts.authority.key(),

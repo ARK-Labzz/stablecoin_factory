@@ -25,8 +25,9 @@ pub struct Factory {
     pub yield_share_protocol: u16,        // Protocol's share in bps (e.g. 1000 = 10%)
     pub yield_share_issuer: u16,          // Issuer's share in bps (e.g. 2000 = 20%)
     pub yield_share_holders: u16,         // Holders' share in bps (e.g. 7000 = 70%) 
-    pub mint_fee_bps: u16,              // Fee in basis points for minting, if any
-    pub burn_fee_bps: u16,              // Fee in basis points for burning, if any
+    pub transfer_fee_bps: u16,              // Fee in basis points for minting, if any
+    pub maximum_transfer_fee: u64,              // Fee in basis points for burning, if any
+    pub protocol_vault: Pubkey,
     pub bond_mappings_count: u8,
     pub bond_mappings: [BondCurrencyMapping; MAX_BOND_MAPPINGS],
     pub payment_base_price_feed_account: Pubkey,      // USDC/USD price feed

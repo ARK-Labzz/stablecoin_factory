@@ -22,4 +22,8 @@ pub struct SovereignCoin {
     pub required_reserve_percentage: u16, // Calculated reserve requirement
     pub fiat_amount: u64,      // Current amount of fiat reserves
     pub bond_amount: u64,      // Current amount of bond holdings
+    pub interest_rate: i16,  // Add this field
+    pub is_interest_bearing: bool,
+    pub is_compressed: bool,
+    pub merkle_tree: Option<Pubkey>,
 }
