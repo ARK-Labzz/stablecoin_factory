@@ -1,0 +1,38 @@
+[package]
+name = "lz_stablecoin_factory"
+version = "0.1.0"
+description = "A stablecoin factory facilitating the creation, minting, and redemption of stablecoins on Solana."
+edition = "2021"
+homepage = "https://stable.fun"
+readme = "./README.md"
+keywords = ["solana", "crypto", "defi", "stablecoin", "layerzero"]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "lz_stablecoin_factory"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+production = []
+devnet = []
+custom-heap = []
+anchor-debug = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = { version="0.30.1", features = ["init-if-needed", "event-cpi"] }
+anchor-spl = { version = "0.30.1", features = ["metadata"] }
+mpl-token-metadata = "4.0.0"
+stablebond-sdk = "2.0.23"
+solana-security-txt = "1.1.1"
+bytemuck_derive = "1.7.0"
+switchboard-on-demand = "0.3.0"
+static_assertions = "1.1.0"
+spl-token-2022 = "1.0.0"
+
+
+

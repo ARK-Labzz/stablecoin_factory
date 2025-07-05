@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-stablecoin_factory = "8i6zoCxrUR8QgiRRHCkFXUJjgN3AAhJrTYXQFnueNGhq"
+lz_stablecoin_factory = "4GEUx2ACQTHWAqn5VDB98z1LDpN1tzspqQhnhguTGbGK"
 
 [registry]
 url = "https://api.apr.dev"
@@ -19,15 +19,14 @@ test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [test]
 startup_wait = 10000
+shutdown_wait = 2000
+upgradeable = false
 
 [test.validator]
 bind_address = "127.0.0.1"
 url = "https://api.mainnet-beta.solana.com"
+ledger = ".anchor/test-ledger"
+rpc_port = 8899
 
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-
-[[test.validator.program]]
-name = "Token Metadata Program"
-program_id = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-program_path = "./metadata.so"

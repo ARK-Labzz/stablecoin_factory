@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the Stablecoin Factory project, built using Anchor Framework. It is housed within the stable-program-library parent folder.
+This is the Stablecoin Factory project, built using Anchor Framework. 
 
 ## Testing
 
@@ -20,4 +20,5 @@ To test the Stablecoin Factory project, follow these steps:
 3. Verify that all tests pass.
 
 ## Our Platform UI
+
 Stablecoin Factory UI codebase is public and is available [here](https://github.com/ARK-Labzz/stabledotfun-web)
