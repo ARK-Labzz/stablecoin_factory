@@ -18,6 +18,7 @@ pub mod update_price_feed;
 pub mod setup_bond_holding;
 pub mod setup_bond_info;
 pub mod setup_ibt_and_transfer_fee;
+pub mod lz_ixs;
 
 
 pub use admin::*;
@@ -37,4 +38,6 @@ pub use update_price_feed::*;
 pub use setup_bond_holding::*;
 pub use setup_bond_info::*;
 pub use setup_ibt_and_transfer_fee::*;
+pub use lz_ixs::*;
+
 

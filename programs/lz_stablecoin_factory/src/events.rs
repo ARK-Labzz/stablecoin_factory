@@ -166,3 +166,78 @@ pub struct BondInfoEvent {
     pub bond_account: Pubkey,
     pub timestamp: i64,
 }
+
+#[event]
+pub struct OFTSent {
+    pub guid: [u8; 32],
+    pub dst_eid: u32,
+    pub from: Pubkey,
+    pub amount_sent_ld: u64,
+    pub amount_received_ld: u64,
+}
+
+#[event]
+pub struct OFTReceived {
+    pub guid: [u8; 32],
+    pub src_eid: u32,
+    pub to: Pubkey,
+    pub amount_received_ld: u64,
+}
+
+#[event]
+pub struct LzOftInitializedEvent {
+    pub sovereign_coin: Pubkey,
+    pub oft_store: Pubkey,
+    pub oft_type: OFTType,
+    pub token_mint: Pubkey,
+    pub token_escrow: Pubkey,
+    pub shared_decimals: u8,
+    pub admin: Pubkey,
+    pub cross_chain_admin: Pubkey,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct LzConfigUpdatedEvent {
+    pub sovereign_coin: Pubkey,
+    pub oft_store: Pubkey,
+    pub config_type: String,
+    pub admin: Pubkey,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct LzPeerConfigUpdatedEvent {
+    pub sovereign_coin: Pubkey,
+    pub remote_eid: u32,
+    pub config_type: String,
+    pub admin: Pubkey,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct LzPauseStateChangedEvent {
+    pub sovereign_coin: Pubkey,
+    pub oft_store: Pubkey,
+    pub paused: bool,
+    pub admin: Pubkey,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct LzFeeWithdrawnEvent {
+    pub sovereign_coin: Pubkey,
+    pub oft_store: Pubkey,
+    pub amount: u64,
+    pub recipient: Pubkey,
+    pub admin: Pubkey,
+    pub timestamp: i64,
+}
+
+#[event]
+pub struct LzEmergencyStopEvent {
+    pub sovereign_coin: Pubkey,
+    pub oft_store: Pubkey,
+    pub emergency_admin: Pubkey,
+    pub timestamp: i64,
+}

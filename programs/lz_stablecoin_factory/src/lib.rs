@@ -57,6 +57,7 @@ use anchor_spl::{
             },
             pod::PodMint,
             state::Mint as MintState,
+            solana_program::program_option::COption,
         },
         initialize_mint2,
         InitializeMint2,
@@ -81,28 +82,52 @@ use stablebond_sdk::{
     find_payout_pda,
     find_sell_liquidity_pda
 };
-// use spl_math::precise_number::PreciseNumber;
 use mpl_token_metadata::accounts::{
     MasterEdition as MasterEditionMpl, 
     Metadata as MetadataMpl
 };
 use std::panic::Location;
 use static_assertions::const_assert_eq;
+use oapp::{
+    endpoint::{
+        MessagingFee, MessagingReceipt, 
+        instructions::{
+            RegisterOAppParams, 
+            SetDelegateParams, 
+            QuoteParams,
+            SendParams as EndpointSendParams,
+            MessagingReceipt, 
+            ClearParams, 
+            SendComposeParams
+        }, 
+        ID as ENDPOINT_ID,
+        cpi::accounts::Clear,
+        ConstructCPIContext,
+    },
+    LzReceiveParams,
+};
 
 
 pub mod error;
 pub mod instructions;
 pub mod state;
 pub mod events;
+pub mod compose_msg_codec;
+pub mod msg_codec;
 pub mod constants;
 pub mod math;
+
+
 
 pub use error::StablecoinError;
 pub use instructions::*;
 pub use state::*;
 pub use events::*;
+pub use compose_msg_codec::*;
+pub use msg_codec::*;
 pub use constants::*;
 pub use math::*;
+
 
 #[cfg(not(feature = "no-entrypoint"))]
 use solana_security_txt::security_txt;
@@ -279,6 +304,97 @@ pub mod lz_stablecoin_factory {
 
     pub fn update_price_feed(ctx: Context<UpdatePriceFeeds>, args: PriceFeedsArgs) -> Result<()> {
         UpdatePriceFeeds::handler(ctx, args)
+    }
+
+    /// Initialize LayerZero OFT functionality for a sovereign coin
+    #[access_control(InitLzOft::validate(&ctx.accounts, &params))]
+    pub fn init_lz_oft(
+        ctx: Context<InitLzOft>, 
+        params: InitLzOftParams
+    ) -> Result<()> {
+        InitLzOft::apply(ctx, &params)
+    }
+
+    /// Configure LayerZero settings
+    pub fn set_lz_config(
+        ctx: Context<SetLzConfig>, 
+        params: SetLzConfigParams
+    ) -> Result<()> {
+        SetLzConfig::apply(ctx, &params)
+    }
+
+    /// Configure remote chain peer settings
+    pub fn set_peer_config(
+        ctx: Context<SetPeerConfig>, 
+        params: SetPeerConfigParams
+    ) -> Result<()> {
+        SetPeerConfig::apply(ctx, &params)
+    }
+
+    /// Quote LayerZero cross-chain send operation
+    pub fn quote_lz_send(
+        ctx: Context<QuoteLzSend>, 
+        params: QuoteLzSendParams
+    ) -> Result<MessagingFee> {
+        QuoteLzSend::apply(&ctx, &params)
+    }
+
+    /// Quote comprehensive stablecoin cross-chain operation
+    pub fn quote_stablecoin_cross_chain(
+        ctx: Context<QuoteStablecoinCrossChain>, 
+        params: QuoteStablecoinCrossChainParams
+    ) -> Result<QuoteStablecoinCrossChainResult> {
+        QuoteStablecoinCrossChain::apply(&ctx, &params)
+    }
+
+    /// Send stablecoins cross-chain via LayerZero
+    pub fn lz_send(
+        ctx: Context<LzSend>, 
+        params: LzSendParams
+    ) -> Result<(MessagingReceipt, StablecoinCrossChainReceipt)> {
+        LzSend::apply(ctx, &params)
+    }
+
+    /// Receive stablecoins from cross-chain via LayerZero
+    pub fn lz_receive(
+        ctx: Context<LzReceive>, 
+        params: LzReceiveParams
+    ) -> Result<()> {
+        LzReceive::apply(ctx, &params)
+    }
+
+    /// Get account types for LayerZero receive operation
+    pub fn lz_receive_types(
+        ctx: Context<LzReceiveTypes>,
+        params: LzReceiveParams,
+    ) -> Result<Vec<oapp::endpoint_cpi::LzAccount>> {
+        LzReceiveTypes::apply(&ctx, &params)
+    }
+
+    /// Set LayerZero pause state
+    pub fn set_lz_pause(
+        ctx: Context<SetLzPause>, 
+        params: SetLzPauseParams
+    ) -> Result<()> {
+        SetLzPause::apply(ctx, &params)
+    }
+
+    /// Withdraw LayerZero fees
+    pub fn withdraw_lz_fee(
+        ctx: Context<WithdrawLzFee>, 
+        params: WithdrawLzFeeParams
+    ) -> Result<()> {
+        WithdrawLzFee::apply(ctx, &params)
+    }
+
+    /// Emergency stop LayerZero operations
+    pub fn emergency_stop_lz(ctx: Context<EmergencyStopLz>) -> Result<()> {
+        EmergencyStopLz::apply(ctx)
+    }
+
+    /// Get LayerZero status information
+    pub fn get_lz_status(ctx: Context<GetLzStatus>) -> Result<LzStatusResult> {
+        GetLzStatus::apply(&ctx)
     }
 }
 

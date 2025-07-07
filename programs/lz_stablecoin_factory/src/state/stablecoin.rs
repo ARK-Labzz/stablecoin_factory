@@ -27,6 +27,9 @@ pub struct SovereignCoin {
     pub is_interest_bearing: bool,
     pub bond_issuance_number: u64,
     pub payment_feed_type: u8,  // 0=UsdcUsd, 1=UsdcMxn, 2=SwitchboardUsdcUsd, etc.
+    pub oft_store: Option<Pubkey>,
+    pub is_cross_chain_enabled: bool,
+    pub cross_chain_admin: Option<Pubkey>,
 }
 
 impl SovereignCoin {

@@ -31,7 +31,6 @@ impl InitializeFactory<'_> {
     ) -> Result<()> {
         let factory = &mut ctx.accounts.factory;
         
-        
         require!(
             yield_share_protocol
                 .checked_add(yield_share_issuer)

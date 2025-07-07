@@ -21,7 +21,7 @@ production = []
 devnet = []
 custom-heap = []
 anchor-debug = []
-idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build", "oapp/idl-build"]
 
 [dependencies]
 anchor-lang = { version="0.30.1", features = ["init-if-needed", "event-cpi"] }
@@ -33,6 +33,7 @@ bytemuck_derive = "1.7.0"
 switchboard-on-demand = "0.3.0"
 static_assertions = "1.1.0"
 spl-token-2022 = "1.0.0"
-
-
-
+oapp = { git = "https://github.com/LayerZero-Labs/LayerZero-v2.git", rev = "34321ac15e47e0dafd25d66659e2f3d1b9b6db8f" }
+utils = { git = "https://github.com/LayerZero-Labs/LayerZero-v2.git", rev = "34321ac15e47e0dafd25d66659e2f3d1b9b6db8f" }
+solana-helper = "0.1.0"
+solana-program = "1.17"

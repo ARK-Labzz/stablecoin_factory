@@ -83,8 +83,8 @@ impl InitializeMintSovereignCoin<'_> {
 
         let sovereign_amount = conversion::calculate_sovereign_coin_amount(
             args.usdc_amount,
-            &base_account_info,  // FIXED: Use stored variable
-            quote_account_info.as_ref(), // FIXED: Use stored variable
+            &base_account_info,  
+            quote_account_info.as_ref(), 
             target_currency,
             sovereign_coin.decimals, 
         )?;

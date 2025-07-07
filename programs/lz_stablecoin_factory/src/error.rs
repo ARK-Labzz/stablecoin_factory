@@ -113,4 +113,33 @@ pub enum StablecoinError {
     DivisionByZero,
     #[msg("Invalid USDC Reserve")]
     InvalidUSDCReserve,
+    // LayerZero specific errors
+    #[msg("Unauthorized LayerZero operation")]
+    LzUnauthorized = 7000,
+    #[msg("Invalid LayerZero sender")]
+    LzInvalidSender = 7001,
+    #[msg("Invalid LayerZero decimals")]
+    LzInvalidDecimals = 7002,
+    #[msg("LayerZero slippage exceeded")]
+    LzSlippageExceeded = 7003,
+    #[msg("Invalid LayerZero token destination")]
+    LzInvalidTokenDest = 7004,
+    #[msg("LayerZero rate limit exceeded")]
+    LzRateLimitExceeded = 7005,
+    #[msg("Invalid LayerZero fee")]
+    LzInvalidFee = 7006,
+    #[msg("LayerZero operations paused")]
+    LzPaused = 7007,
+    #[msg("LayerZero not enabled for this sovereign coin")]
+    LzNotEnabled = 7100,
+    #[msg("LayerZero already enabled for this sovereign coin")]
+    LzAlreadyEnabled = 7101,
+    #[msg("Invalid LayerZero OFT store")]
+    LzInvalidOftStore = 7102,
+    #[msg("Invalid LayerZero peer configuration")]
+    LzInvalidPeer = 7103,
+    #[msg("Invalid LayerZero rate limit configuration")]
+    LzInvalidRateLimit = 7104,
+    #[msg("Insufficient liquidity for cross-chain transfer")]
+    InsufficientLiquidity = 7105,
 }
